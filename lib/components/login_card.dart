@@ -53,6 +53,7 @@ class _LoginCardState extends State<LoginCard> {
       contactsModel = ContactsModel.fromJson(json.decode(r2.body));
       var r3 = await api.get(context, 'dashboard');
       dashboardModel = DashboardModel.fromJson(json.decode(r3.body));
+      accountId = dashboardModel.payload.dashboard[0].id;
 
       setState(() {
         verifying = false;
