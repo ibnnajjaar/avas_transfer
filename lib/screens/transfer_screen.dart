@@ -15,7 +15,17 @@ class TransferScreen extends StatelessWidget {
               child: Image.asset('assets/logo.png'),
             ),
           ),
-          TransferCard(),
+          SizedBox.expand(
+            child: Center(
+              child: SingleChildScrollView(
+                physics: BouncingScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 30),
+                  child: TransferCard(),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );

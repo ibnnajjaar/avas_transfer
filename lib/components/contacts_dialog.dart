@@ -11,7 +11,7 @@ class ContactsDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       child: ListView.separated(
         padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         physics: BouncingScrollPhysics(),
@@ -24,7 +24,7 @@ class ContactsDialog extends StatelessWidget {
             child: Container(
               color: Colors.transparent,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                 child: Row(
                   children: [
                     Container(
