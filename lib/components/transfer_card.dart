@@ -43,6 +43,7 @@ class _TransferCardState extends State<TransferCard> {
   String validateAccountString = '';
   Color validateAccountStringColor = Colors.grey.shade700;
   int state = 0;
+  String receiptFile = "";
 
   _validateAccount(contact.Payload c) async {
     FocusScope.of(context).unfocus();
@@ -359,13 +360,8 @@ class _TransferCardState extends State<TransferCard> {
   }
 
   _createAppDirectory() async {
-    Directory appDocDirectory;
-
-    if (Platform.isAndroid)
-      appDocDirectory = await getExternalStorageDirectory();
-    else if (Platform.isIOS) appDocDirectory = await getApplicationDocumentsDirectory();
-
-    var dirPath = '${appDocDirectory.path}/BML Avas Transfer';
+    String dirPath = await _getExternalStoragePath();
+    debugPrint(dirPath);
     final myDir = Directory(dirPath);
     myDir.exists().then((isThere) async {
       if (isThere) {
@@ -382,33 +378,51 @@ class _TransferCardState extends State<TransferCard> {
     });
   }
 
+  _getExternalStoragePath() async {
+    Directory directory;
+    String path = "";
+
+    if (Platform.isAndroid) {
+      directory = await getExternalStorageDirectory();
+      List<String> folders = directory.path.split("/");
+      for (int i = 1; i < folders.length; i++) {
+        String folder = folders[i];
+        if (folder != "Android")
+          path += "/$folder";
+        else break;
+      }
+      path += "/BML Avas Transfer";
+    }
+    else if (Platform.isIOS) {
+      directory = await getApplicationDocumentsDirectory();
+      path = directory.path;
+    }
+
+    return path;
+  }
+
+  _saveReceipt() async {
+    RenderRepaintBoundary boundary = _receiptKey.currentContext.findRenderObject();
+    ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+    ByteData byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    var pngBytes = byteData.buffer.asUint8List();
+
+    String dirPath = await _getExternalStoragePath();
+    var filename = DateTime.now().millisecondsSinceEpoch;
+    var path = '$dirPath/$filename.png';
+    File(path).writeAsBytesSync(pngBytes.buffer.asInt8List());
+
+    receiptFile = path;
+  }
+
   _shareReceipt() async {
     try {
-      _createAppDirectory();
+      await _createAppDirectory();
 
-      RenderRepaintBoundary boundary = _receiptKey.currentContext.findRenderObject();
-      ui.Image image = await boundary.toImage(pixelRatio: 3.0);
-      ByteData byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      var pngBytes = byteData.buffer.asUint8List();
-//        var bs64 = base64Encode(pngBytes);
+      if (receiptFile.isEmpty)
+        await _saveReceipt();
 
-//        checkPermission();
-//        getPermissionStatus();
-//        requestPermission();
-
-      Directory appDocDirectory;
-
-      if (Platform.isAndroid)
-        appDocDirectory = await getExternalStorageDirectory();
-      else if (Platform.isIOS) appDocDirectory = await getApplicationDocumentsDirectory();
-
-      var dirPath = '${appDocDirectory.path}/BML Avas Transfer';
-      var filename = DateTime.now().millisecondsSinceEpoch;
-      var path = '$dirPath/$filename.png';
-      File(path).writeAsBytesSync(pngBytes.buffer.asInt8List());
-
-      print(path);
-      ShareExtend.share(path, "image");
+      await ShareExtend.share(receiptFile, "image");
     } catch (e) {
       print(e);
     }
@@ -515,8 +529,12 @@ class _TransferCardState extends State<TransferCard> {
                           width: 1.5,
                         ),
                         onPressed: () async {
+                          if (state == 2 && receiptFile.isEmpty)
+                            await _saveReceipt();
+
                           setState(() {
                             _otpController.clear();
+                            receiptFile = "";
                             state = 0;
                           });
                         },
