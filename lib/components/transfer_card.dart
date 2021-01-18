@@ -32,7 +32,8 @@ class TransferCard extends StatefulWidget {
 }
 
 class _TransferCardState extends State<TransferCard> {
-  final TextEditingController _accountNumberController = TextEditingController();
+  final TextEditingController _accountNumberController =
+      TextEditingController();
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _otpController = TextEditingController();
   final TextEditingController _remarksController = TextEditingController();
@@ -66,7 +67,8 @@ class _TransferCardState extends State<TransferCard> {
     debugPrint(res.body.toString());
 
     if (res.statusCode == 200) {
-      AccountValidateModel model = AccountValidateModel.fromJson(json.decode(res.body));
+      AccountValidateModel model =
+          AccountValidateModel.fromJson(json.decode(res.body));
       if (model.success) {
         debugPrint('success');
         setState(() {
@@ -78,8 +80,9 @@ class _TransferCardState extends State<TransferCard> {
       } else {
         setState(() {
           validateAccountStringColor = appColor;
-          validateAccountString =
-              model.code == 38 ? model.message.toUpperCase() : 'INVALID ACCOUNT NUMBER';
+          validateAccountString = model.code == 38
+              ? model.message.toUpperCase()
+              : 'INVALID ACCOUNT NUMBER';
         });
         debugPrint('failed');
       }
@@ -115,7 +118,8 @@ class _TransferCardState extends State<TransferCard> {
     });
 
     debugPrint(res.body);
-    TransferReviewModel model = TransferReviewModel.fromJson(json.decode(res.body));
+    TransferReviewModel model =
+        TransferReviewModel.fromJson(json.decode(res.body));
     if (model.success) {
       setState(() {
         state = 1;
@@ -162,7 +166,8 @@ class _TransferCardState extends State<TransferCard> {
     _otpController.clear();
     validateAccountString = '';
 
-    TransferConfirmModel model = TransferConfirmModel.fromJson(json.decode(res.body));
+    TransferConfirmModel model =
+        TransferConfirmModel.fromJson(json.decode(res.body));
     if (model.success) {
       _accountNumberController.clear();
       _amountController.clear();
@@ -389,11 +394,11 @@ class _TransferCardState extends State<TransferCard> {
         String folder = folders[i];
         if (folder != "Android")
           path += "/$folder";
-        else break;
+        else
+          break;
       }
       path += "/BML Avas Transfer";
-    }
-    else if (Platform.isIOS) {
+    } else if (Platform.isIOS) {
       directory = await getApplicationDocumentsDirectory();
       path = directory.path;
     }
@@ -402,7 +407,8 @@ class _TransferCardState extends State<TransferCard> {
   }
 
   _saveReceipt() async {
-    RenderRepaintBoundary boundary = _receiptKey.currentContext.findRenderObject();
+    RenderRepaintBoundary boundary =
+        _receiptKey.currentContext.findRenderObject();
     ui.Image image = await boundary.toImage(pixelRatio: 3.0);
     ByteData byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     var pngBytes = byteData.buffer.asUint8List();
@@ -419,8 +425,7 @@ class _TransferCardState extends State<TransferCard> {
     try {
       await _createAppDirectory();
 
-      if (receiptFile.isEmpty)
-        await _saveReceipt();
+      if (receiptFile.isEmpty) await _saveReceipt();
 
       await ShareExtend.share(receiptFile, "image");
     } catch (e) {
@@ -453,17 +458,43 @@ class _TransferCardState extends State<TransferCard> {
       alignment: Alignment.center,
       padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 45),
       child: GestureDetector(
-        onTap: () async {
-          await SharedPreferences.clear();
+        onLongPress: () async {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return CupertinoAlertDialog(
+                  title: Text('Are you sure to sign out?'),
+                  actions: [
+                    CupertinoButton(
+                        child: Text(
+                          'No',
+                          style: TextStyle(color: Colors.grey.shade600),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        }),
+                    CupertinoButton(
+                        child: Text(
+                          'Yes',
+                          style: TextStyle(color: appColor),
+                        ),
+                        onPressed: () async {
+                          Navigator.pop(context);
 
-          Navigator.pushReplacement(
-            context,
-            CupertinoPageRoute(
-              builder: (BuildContext context) {
-                return LoginScreen();
-              },
-            ),
-          );
+                          await SharedPreferences.clear();
+
+                          Navigator.pushReplacement(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (BuildContext context) {
+                                return LoginScreen();
+                              },
+                            ),
+                          );
+                        }),
+                  ],
+                );
+              });
         },
         child: Column(
           mainAxisSize: MainAxisSize.min,
