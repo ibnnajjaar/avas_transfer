@@ -15,6 +15,7 @@ import 'package:avas_transfer/utils/shared_preferences.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_extend/share_extend.dart';
 import 'package:sms/sms.dart';
@@ -39,6 +40,8 @@ class _TransferCardState extends State<TransferCard> {
   final TextEditingController _remarksController = TextEditingController();
   final GlobalKey _receiptKey = new GlobalKey();
   TransferConfirmModel receipt;
+
+  final FocusNode _amountFocusNode = FocusNode();
 
   bool verifying = false;
   String validateAccountString = '';
@@ -77,6 +80,7 @@ class _TransferCardState extends State<TransferCard> {
               ? '${model.payload.name.toUpperCase()} (${model.payload.currency})'
               : '${c.alias} (${c.currency})';
         });
+        _amountFocusNode.requestFocus();
       } else {
         setState(() {
           validateAccountStringColor = appColor;
@@ -212,6 +216,22 @@ class _TransferCardState extends State<TransferCard> {
               color: Colors.black26,
             ),
             counterText: '',
+            prefixIcon: IconButton(
+              onPressed: () async {
+                String res = await FlutterBarcodeScanner.scanBarcode(
+                  '#D60D25',
+                  'Cancel',
+                  false,
+                  ScanMode.QR,
+                );
+
+                if (res.length == 13) {
+                  _accountNumberController.text = res;
+                  _validateAccount(null);
+                }
+              },
+              icon: Icon(Icons.camera_alt_outlined),
+            ),
             suffixIcon: IconButton(
               onPressed: () async {
                 await showDialog(
@@ -276,6 +296,7 @@ class _TransferCardState extends State<TransferCard> {
             counterText: '',
           ),
           controller: _amountController,
+          focusNode: _amountFocusNode,
           onSubmitted: (val) {},
           style: TextStyle(
             fontSize: 30,
