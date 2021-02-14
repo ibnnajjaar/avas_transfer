@@ -16,6 +16,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:flutter_mobile_vision/flutter_mobile_vision.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_extend/share_extend.dart';
 import 'package:sms/sms.dart';
@@ -195,6 +196,118 @@ class _TransferCardState extends State<TransferCard> {
     }
   }
 
+  showCameraDialog() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return Center(
+            child: Wrap(
+              children: [
+                SizedBox(
+                  height: 80,
+                  width: 80,
+                  child: FlatButton(
+                    color: Colors.white,
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _scanBarcode();
+                    },
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.qr_code_scanner_rounded,
+                          size: 35,
+                          color: Colors.grey.shade600,
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Text(
+                          'QR',
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                SizedBox(
+                  height: 80,
+                  width: 80,
+                  child: FlatButton(
+                    color: Colors.white,
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _read();
+                    },
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.qr_code_scanner_rounded,
+                          size: 35,
+                          color: Colors.grey.shade600,
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Text(
+                          'OCR',
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ),
+          );
+        });
+  }
+
+  _scanBarcode() async {
+    String res = await FlutterBarcodeScanner.scanBarcode(
+      '#D60D25',
+      'Cancel',
+      false,
+      ScanMode.QR,
+    );
+
+    if (res.length == 13) {
+      _accountNumberController.text = res;
+      _validateAccount(null);
+    }
+  }
+
+  Future<Null> _read() async {
+    List<OcrText> texts = [];
+    try {
+      texts = await FlutterMobileVision.read(
+        camera: FlutterMobileVision.CAMERA_BACK,
+        waitTap: true,
+      );
+
+      debugPrint('total read: ${texts[0].value}');
+      debugPrint('total read: ${texts.length}');
+      for (OcrText text in texts) {
+        debugPrint('Scan Data: ${text.value}');
+        if (text.value.startsWith('7') && text.value.length == 13) {
+          _accountNumberController.text = text.value;
+          _validateAccount(null);
+        }
+      }
+    } on Exception {
+      // Unable to read text
+    }
+  }
+
   _reviewBody() {
     return Column(
       children: [
@@ -218,17 +331,7 @@ class _TransferCardState extends State<TransferCard> {
             counterText: '',
             prefixIcon: IconButton(
               onPressed: () async {
-                String res = await FlutterBarcodeScanner.scanBarcode(
-                  '#D60D25',
-                  'Cancel',
-                  false,
-                  ScanMode.QR,
-                );
-
-                if (res.length == 13) {
-                  _accountNumberController.text = res;
-                  _validateAccount(null);
-                }
+                showCameraDialog();
               },
               icon: Icon(Icons.camera_alt_outlined),
             ),

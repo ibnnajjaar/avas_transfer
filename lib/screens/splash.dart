@@ -8,8 +8,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../constants.dart';
-
 class Splash extends StatefulWidget {
   @override
   _SplashState createState() => _SplashState();
@@ -22,6 +20,10 @@ class _SplashState extends State<Splash> {
     }
 
     if (await Permission.sms.request().isGranted) {
+      // Either the permission was already granted before or the user just granted it.
+    }
+
+    if (await Permission.camera.request().isGranted) {
       // Either the permission was already granted before or the user just granted it.
     }
 

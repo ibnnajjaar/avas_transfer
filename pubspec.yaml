@@ -20,6 +20,7 @@ dependencies:
   path_provider: ^1.6.24
   share_extend: ^1.1.9
   flutter_barcode_scanner: ^1.0.2
+  flutter_mobile_vision: ^0.1.4+1
 
 dev_dependencies:
   flutter_test:
