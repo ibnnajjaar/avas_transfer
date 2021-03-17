@@ -40,8 +40,6 @@ class _LoginCardState extends State<LoginCard> {
         'password': _passwordController.text.trim()
       },
     );
-
-    debugPrint(res.body);
     DefaultModel model = DefaultModel.fromJson(res.body);
     if (model.success) {
       await SharedPreferences.setString('username', _loginIdController.text.trim());
@@ -53,8 +51,7 @@ class _LoginCardState extends State<LoginCard> {
       contactsModel = ContactsModel.fromJson(json.decode(r2.body));
       var r3 = await api.get(context, 'dashboard');
       dashboardModel = DashboardModel.fromJson(json.decode(r3.body));
-      accountId = dashboardModel.payload.dashboard[0].id;
-
+      await SharedPreferences.setString('accountId', dashboardModel.payload.dashboard[0].id);
       setState(() {
         verifying = false;
       });

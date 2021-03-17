@@ -119,8 +119,6 @@ Future<bool> login(context) async {
     contactsModel = ContactsModel.fromJson(json.decode(r2.body));
     var r3 = await get(context, 'dashboard');
     dashboardModel = DashboardModel.fromJson(json.decode(r3.body));
-    accountId = dashboardModel.payload.dashboard[0].id;
-    debugPrint(accountId);
   }
   return model.success;
 }
