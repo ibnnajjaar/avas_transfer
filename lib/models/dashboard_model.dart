@@ -4,17 +4,14 @@ class DashboardModel {
   String message;
   Payload payload;
 
-  DashboardModel({
-      this.success,
-      this.code,
-      this.message,
-      this.payload});
+  DashboardModel({this.success, this.code, this.message, this.payload});
 
   DashboardModel.fromJson(dynamic json) {
     success = json["success"];
     code = json["code"];
     message = json["message"];
-    payload = json["payload"] != null ? Payload.fromJson(json["payload"]) : null;
+    payload =
+        json["payload"] != null ? Payload.fromJson(json["payload"]) : null;
   }
 }
 
@@ -22,9 +19,7 @@ class Payload {
   Config config;
   List<Dashboard> dashboard;
 
-  Payload({
-      this.config,
-      this.dashboard});
+  Payload({this.config, this.dashboard});
 
   Payload.fromJson(dynamic json) {
     config = json["config"] != null ? Config.fromJson(json["config"]) : null;
@@ -57,7 +52,7 @@ class Dashboard {
   dynamic workingBalance;
   dynamic ledgerBalance;
   dynamic clearedBalance;
-  dynamic availableBalance;
+  double availableBalance;
   dynamic lockedAmount;
   String minimumBalance;
   dynamic overdraftLimit;
@@ -66,8 +61,8 @@ class Dashboard {
   String branch;
   bool success;
 
-  Dashboard({
-      this.customer,
+  Dashboard(
+      {this.customer,
       this.accountType,
       this.product,
       this.productCode,
@@ -107,7 +102,8 @@ class Dashboard {
     statecode = json["statecode"];
     statuscode = json["statuscode"];
     accountStatus = json["account_status"];
-    actions = json["actions"] != null ? Actions.fromJson(json["actions"]) : null;
+    actions =
+        json["actions"] != null ? Actions.fromJson(json["actions"]) : null;
     id = json["id"];
     account = json["account"];
     alias = json["alias"];
@@ -115,7 +111,9 @@ class Dashboard {
     workingBalance = json["workingBalance"];
     ledgerBalance = json["ledgerBalance"];
     clearedBalance = json["clearedBalance"];
-    availableBalance = json["availableBalance"];
+    availableBalance = json["availableBalance"] == null
+        ? 0.00
+        : double.parse(json["availableBalance"].toString());
     lockedAmount = json["lockedAmount"];
     minimumBalance = json["minimumBalance"];
     overdraftLimit = json["overdraftLimit"];
@@ -124,7 +122,6 @@ class Dashboard {
     branch = json["branch"];
     success = json["success"];
   }
-
 }
 
 class Actions {
@@ -133,11 +130,7 @@ class Actions {
   bool pay;
   bool topup;
 
-  Actions({
-      this.transfer,
-      this.history,
-      this.pay,
-      this.topup});
+  Actions({this.transfer, this.history, this.pay, this.topup});
 
   Actions.fromJson(dynamic json) {
     transfer = json["transfer"];
@@ -151,9 +144,7 @@ class Config {
   int cardStatementMaxMonths;
   int casaHistoryMaxMonths;
 
-  Config({
-      this.cardStatementMaxMonths,
-      this.casaHistoryMaxMonths});
+  Config({this.cardStatementMaxMonths, this.casaHistoryMaxMonths});
 
   Config.fromJson(dynamic json) {
     cardStatementMaxMonths = json["card_statement_max_months"];

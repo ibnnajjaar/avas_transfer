@@ -3,9 +3,10 @@ import 'package:avas_transfer/components/message_dialog.dart';
 import 'package:avas_transfer/screens/login_screen.dart';
 import 'package:avas_transfer/screens/transfer_screen.dart';
 import 'package:avas_transfer/services/api.dart' as api;
-import 'package:avas_transfer/utils/shared_preferences.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class Splash extends StatefulWidget {
@@ -23,13 +24,8 @@ class _SplashState extends State<Splash> {
       // Either the permission was already granted before or the user just granted it.
     }
 
-    if (await Permission.camera.request().isGranted) {
-      // Either the permission was already granted before or the user just granted it.
-    }
-
-    await SharedPreferences.init();
-
-    if (SharedPreferences.getString('username').isNotEmpty) {
+    final box = GetStorage();
+    if (box.read('username') != null) {
       bool loggedIn = await api.login(context);
       if (loggedIn) {
         Navigator.pushReplacement(
@@ -61,7 +57,10 @@ class _SplashState extends State<Splash> {
   @override
   void initState() {
     super.initState();
-    _init(context);
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      // fetch data
+      _init(context);
+    });
   }
 
   @override

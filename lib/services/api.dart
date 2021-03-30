@@ -5,14 +5,15 @@ import 'package:avas_transfer/models/contacts_model.dart';
 import 'package:avas_transfer/models/dashboard_model.dart';
 import 'package:avas_transfer/models/default_model.dart';
 import 'package:avas_transfer/screens/login_screen.dart';
-import 'package:avas_transfer/utils/shared_preferences.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 
 import '../global.dart';
 
-const String API_ENDPOINT = 'https://www.bankofmaldives.com.mv/internetbanking/api/';
+const String baseUrl = 'www.bankofmaldives.com.mv';
+const String apiPath = '/internetbanking/api/';
 
 final JsonEncoder _encoder = new JsonEncoder();
 
@@ -60,11 +61,11 @@ String _generateCookieHeader() {
 }
 
 Future<http.Response> get(context, String path) async {
-  var res = await http.get(API_ENDPOINT + path, headers: headers);
+  var res = await http.get(Uri.https(baseUrl, apiPath + path), headers: headers);
   if (res.statusCode == 401) {
     bool loggedIn = await login(context);
     if (loggedIn)
-      res = await http.get(API_ENDPOINT + path, headers: headers);
+      res = await http.get(Uri.https(baseUrl, apiPath + path), headers: headers);
     else
       _gotoLoginScreen(context);
   }
@@ -80,13 +81,13 @@ Future<http.Response> get(context, String path) async {
 }
 
 Future<http.Response> post(context, String path, {body, encoding}) async {
-  var res = await http.post(API_ENDPOINT + path,
+  var res = await http.post(Uri.https(baseUrl, apiPath + path),
       body: _encoder.convert(body), headers: headers, encoding: encoding);
 
   if (res.statusCode == 401) {
     bool loggedIn = await login(context);
     if (loggedIn)
-      res = await http.post(API_ENDPOINT + path,
+      res = await http.post(Uri.https(baseUrl, apiPath + path),
           body: _encoder.convert(body), headers: headers, encoding: encoding);
     else
       _gotoLoginScreen(context);
@@ -103,12 +104,14 @@ Future<http.Response> post(context, String path, {body, encoding}) async {
 }
 
 Future<bool> login(context) async {
+  final box = GetStorage();
+
   var res = await post(
     context,
     'login',
     body: {
-      'username': SharedPreferences.getString('username'),
-      'password': SharedPreferences.getString('password'),
+      'username': box.read('username'),
+      'password': box.read('password'),
     },
   );
   DefaultModel model = DefaultModel.fromJson(res.body);

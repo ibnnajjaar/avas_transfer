@@ -13,12 +13,11 @@ import 'package:avas_transfer/models/transfer_confirm_model.dart';
 import 'package:avas_transfer/models/transfer_review_model.dart';
 import 'package:avas_transfer/screens/login_screen.dart';
 import 'package:avas_transfer/services/api.dart' as api;
-import 'package:avas_transfer/utils/shared_preferences.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
-import 'package:flutter_mobile_vision/flutter_mobile_vision.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_extend/share_extend.dart';
@@ -53,7 +52,8 @@ class _TransferCardState extends State<TransferCard> {
   Color validateAccountStringColor = Colors.grey.shade700;
   int state = 0;
   String receiptFile = "";
-  var formatter = NumberFormat('#,###.##');
+  //var formatter = NumberFormat('#,###.##');
+  var formatter = new NumberFormat.currency(locale: "en_US", symbol: "");
 
   _validateAccount(contact.Payload c) async {
     FocusScope.of(context).unfocus();
@@ -110,6 +110,8 @@ class _TransferCardState extends State<TransferCard> {
       verifying = true;
     });
 
+    final box = GetStorage();
+
     var res = await api.post(
       context,
       'transfer',
@@ -117,7 +119,7 @@ class _TransferCardState extends State<TransferCard> {
         'transfertype': 'IAT',
         'channel': 'mobile',
         'currency': 'MVR',
-        'debitAccount': SharedPreferences.getString('accountId'),
+        'debitAccount': box.read('accountId'),
         'debitAmount': _amountController.text.trim(),
         'creditAccount': _accountNumberController.text.trim(),
       },
@@ -155,6 +157,7 @@ class _TransferCardState extends State<TransferCard> {
       verifying = true;
     });
 
+    final box = GetStorage();
     var res = await api.post(
       context,
       'transfer',
@@ -165,7 +168,7 @@ class _TransferCardState extends State<TransferCard> {
         'narrative2': '',
         'm_ref': '',
         'additionalInstruction': '',
-        'debitAccount': SharedPreferences.getString('accountId'),
+        'debitAccount': box.read('accountId'),
         'debitAmount': _amountController.text.trim(),
         'creditAccount': _accountNumberController.text.trim(),
         'remarks': _remarksController.text.trim(),
@@ -190,12 +193,13 @@ class _TransferCardState extends State<TransferCard> {
       });
 
       var res = await api.get(context, 'dashboard');
+      final box = GetStorage();
       setState(() {
         dashboardModel = DashboardModel.fromJson(json.decode(res.body));
-        account = dashboardModel.payload.dashboard.firstWhere((element) =>
-            element.id == SharedPreferences.getString('accountId'));
+        account = dashboardModel.payload.dashboard
+            .firstWhere((element) => element.id == box.read('accountId'));
       });
-
+      await _saveReceipt();
     } else {
       showDialog(
         context: context,
@@ -256,7 +260,7 @@ class _TransferCardState extends State<TransferCard> {
                     color: Colors.white,
                     onPressed: () {
                       Navigator.pop(context);
-                      _read();
+                      // _read();
                     },
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -293,34 +297,34 @@ class _TransferCardState extends State<TransferCard> {
       ScanMode.QR,
     );
 
-    _accountNumberController.text = res;
-    _validateAccount(null);
-    // if (res.length == 13) {
-    //
-    // }
-  }
-
-  Future<Null> _read() async {
-    List<OcrText> texts = [];
-    try {
-      texts = await FlutterMobileVision.read(
-        camera: FlutterMobileVision.CAMERA_BACK,
-        waitTap: true,
-      );
-
-      debugPrint('total read: ${texts[0].value}');
-      debugPrint('total read: ${texts.length}');
-      for (OcrText text in texts) {
-        debugPrint('Scan Data: ${text.value}');
-        if (text.value.startsWith('7') && text.value.length == 13) {
-          _accountNumberController.text = text.value;
-          _validateAccount(null);
-        }
-      }
-    } on Exception {
-      // Unable to read text
+    // 13 is the normal account length
+    if (res.length >= 10) {
+      _accountNumberController.text = res;
+      _validateAccount(null);
     }
   }
+
+  // Future<Null> _read() async {
+  //   List<OcrText> texts = [];
+  //   try {
+  //     texts = await FlutterMobileVision.read(
+  //       camera: FlutterMobileVision.CAMERA_BACK,
+  //       waitTap: true,
+  //     );
+  //
+  //     debugPrint('total read: ${texts[0].value}');
+  //     debugPrint('total read: ${texts.length}');
+  //     for (OcrText text in texts) {
+  //       debugPrint('Scan Data: ${text.value}');
+  //       if (text.value.startsWith('7') && text.value.length == 13) {
+  //         _accountNumberController.text = text.value;
+  //         _validateAccount(null);
+  //       }
+  //     }
+  //   } on Exception {
+  //     // Unable to read text
+  //   }
+  // }
 
   _reviewBody() {
     return Column(
@@ -333,40 +337,41 @@ class _TransferCardState extends State<TransferCard> {
                   return AccountsDialog();
                 });
             if (res != null) {
-              SharedPreferences.setString('accountId', res);
+              final box = GetStorage();
+              box.write('accountId', res);
               setState(() {
                 account = dashboardModel.payload.dashboard.firstWhere(
-                    (element) =>
-                        element.id == SharedPreferences.getString('accountId'));
+                    (element) => element.id == box.read('accountId'));
               });
             }
           },
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
             decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12.withOpacity(0.07),
-                    blurRadius: 10,
-                    offset: Offset(0, 5),
-                  )
-                ]),
+              borderRadius: BorderRadius.circular(10),
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12.withOpacity(0.07),
+                  blurRadius: 10,
+                  offset: Offset(0, 5),
+                )
+              ],
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   account.account,
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 16,
                     color: Colors.black26,
                   ),
                 ),
                 Text(
                   '${account.currency} ${formatter.format(account.availableBalance)}',
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: account.availableBalance > 0
                         ? Colors.green
@@ -400,7 +405,8 @@ class _TransferCardState extends State<TransferCard> {
             counterText: '',
             prefixIcon: IconButton(
               onPressed: () async {
-                showCameraDialog();
+                //showCameraDialog();
+                _scanBarcode();
               },
               icon: Icon(Icons.camera_alt_outlined),
             ),
@@ -628,8 +634,9 @@ class _TransferCardState extends State<TransferCard> {
 
   @override
   void initState() {
-    account = dashboardModel.payload.dashboard.firstWhere(
-        (element) => element.id == SharedPreferences.getString('accountId'));
+    final box = GetStorage();
+    account = dashboardModel.payload.dashboard
+        .firstWhere((element) => element.id == box.read('accountId'));
 
     super.initState();
     SmsReceiver receiver = new SmsReceiver();
@@ -677,7 +684,9 @@ class _TransferCardState extends State<TransferCard> {
                         onPressed: () async {
                           Navigator.pop(context);
 
-                          await SharedPreferences.clear();
+                          final box = GetStorage();
+                          await box.erase();
+                          // await SharedPreferences.clear();
 
                           Navigator.pushReplacement(
                             context,

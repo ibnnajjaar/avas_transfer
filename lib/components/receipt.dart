@@ -44,11 +44,17 @@ class _ReceiptState extends State<Receipt> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Status'),
+                Text(
+                  'Status',
+                  style: TextStyle(
+                    fontSize: 14,
+                  ),
+                ),
                 Text(
                   'SUCCESS',
                   style: TextStyle(
                     color: Colors.green,
+                    fontSize: 14,
                   ),
                 ),
               ],
@@ -60,7 +66,12 @@ class _ReceiptState extends State<Receipt> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Message'),
+                Text(
+                  'Message',
+                  style: TextStyle(
+                    fontSize: 14,
+                  ),
+                ),
                 SizedBox(
                   width: 30,
                 ),
@@ -70,6 +81,7 @@ class _ReceiptState extends State<Receipt> {
                     textAlign: TextAlign.end,
                     style: TextStyle(
                       color: Colors.grey.shade600,
+                      fontSize: 14,
                     ),
                   ),
                 ),
@@ -82,11 +94,17 @@ class _ReceiptState extends State<Receipt> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Ref #'),
+                Text(
+                  'Ref #',
+                  style: TextStyle(
+                    fontSize: 14,
+                  ),
+                ),
                 Text(
                   widget.receipt.payload.reference,
                   style: TextStyle(
                     color: Colors.grey.shade600,
+                    fontSize: 14,
                   ),
                 ),
               ],
@@ -98,11 +116,18 @@ class _ReceiptState extends State<Receipt> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Date'),
                 Text(
-                  template.format(DateTime.parse(widget.receipt.payload.timestamp.split('+')[0])),
+                  'Date',
+                  style: TextStyle(
+                    fontSize: 14,
+                  ),
+                ),
+                Text(
+                  template.format(DateTime.parse(
+                      widget.receipt.payload.timestamp.split('+')[0])),
                   style: TextStyle(
                     color: Colors.grey.shade600,
+                    fontSize: 14,
                   ),
                 ),
               ],
@@ -114,11 +139,17 @@ class _ReceiptState extends State<Receipt> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('From'),
+                Text(
+                  'From',
+                  style: TextStyle(
+                    fontSize: 14,
+                  ),
+                ),
                 Text(
                   widget.receipt.payload.from.name,
                   style: TextStyle(
                     color: Colors.grey.shade600,
+                    fontSize: 14,
                   ),
                 ),
               ],
@@ -130,7 +161,12 @@ class _ReceiptState extends State<Receipt> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('To'),
+                Text(
+                  'To',
+                  style: TextStyle(
+                    fontSize: 14,
+                  ),
+                ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -139,6 +175,7 @@ class _ReceiptState extends State<Receipt> {
                       textAlign: TextAlign.end,
                       style: TextStyle(
                         color: Colors.grey.shade600,
+                        fontSize: 14,
                       ),
                     ),
                     Text(
@@ -146,6 +183,7 @@ class _ReceiptState extends State<Receipt> {
                       textAlign: TextAlign.end,
                       style: TextStyle(
                         color: Colors.grey.shade600,
+                        fontSize: 14,
                       ),
                     ),
                   ],
@@ -159,11 +197,17 @@ class _ReceiptState extends State<Receipt> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Amount'),
+                Text(
+                  'Amount',
+                  style: TextStyle(
+                    fontSize: 14,
+                  ),
+                ),
                 Text(
                   '${widget.receipt.payload.currency} ${widget.receipt.payload.debitamount}',
                   style: TextStyle(
                     color: Colors.grey.shade600,
+                    fontSize: 14,
                   ),
                 ),
               ],
@@ -179,7 +223,12 @@ class _ReceiptState extends State<Receipt> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Remarks'),
+                      Text(
+                        'Remarks',
+                        style: TextStyle(
+                          fontSize: 14,
+                        ),
+                      ),
                       SizedBox(
                         width: 30,
                       ),
@@ -189,6 +238,7 @@ class _ReceiptState extends State<Receipt> {
                           textAlign: TextAlign.end,
                           style: TextStyle(
                             color: Colors.grey.shade600,
+                            fontSize: 14,
                           ),
                         ),
                       ),

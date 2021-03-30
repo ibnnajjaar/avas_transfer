@@ -5,9 +5,9 @@ import 'package:avas_transfer/models/dashboard_model.dart';
 import 'package:avas_transfer/models/default_model.dart';
 import 'package:avas_transfer/screens/transfer_screen.dart';
 import 'package:avas_transfer/services/api.dart' as api;
-import 'package:avas_transfer/utils/shared_preferences.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 
 import '../constants.dart';
 import '../global.dart';
@@ -42,8 +42,9 @@ class _LoginCardState extends State<LoginCard> {
     );
     DefaultModel model = DefaultModel.fromJson(res.body);
     if (model.success) {
-      await SharedPreferences.setString('username', _loginIdController.text.trim());
-      await SharedPreferences.setString('password', _passwordController.text.trim());
+      final box = GetStorage();
+      await box.write('username', _loginIdController.text.trim());
+      await box.write('password', _passwordController.text.trim());
 
       var r1 = await api.get(context, 'profile');
       debugPrint(r1.body.toString());
@@ -51,7 +52,8 @@ class _LoginCardState extends State<LoginCard> {
       contactsModel = ContactsModel.fromJson(json.decode(r2.body));
       var r3 = await api.get(context, 'dashboard');
       dashboardModel = DashboardModel.fromJson(json.decode(r3.body));
-      await SharedPreferences.setString('accountId', dashboardModel.payload.dashboard[0].id);
+      await box.write('accountId', dashboardModel.payload.dashboard[0].id);
+
       setState(() {
         verifying = false;
       });

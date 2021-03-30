@@ -7,7 +7,7 @@ class AccountsDialog extends StatelessWidget {
       .where((element) => element.accountType == 'CASA')
       .toList();
 
-  var formatter = NumberFormat('#,###.##');
+  var formatter = new NumberFormat.currency(locale: "en_US", symbol: "");
 
   @override
   Widget build(BuildContext context) {
@@ -22,13 +22,13 @@ class AccountsDialog extends StatelessWidget {
             },
             title: Text(accounts[index].account, style: TextStyle(
               color: Colors.black38,
-              fontSize: 18,
+              fontSize: 16,
             ),),
             trailing: Text(
               '${accounts[index].currency} ${formatter.format(accounts[index].availableBalance)}',
               style: TextStyle(
                 color: Colors.green,
-                fontSize: 18,
+                fontSize: 16,
               ),
             ),
           );

@@ -28,8 +28,8 @@ class ContactsDialog extends StatelessWidget {
                 child: Row(
                   children: [
                     Container(
-                      width: 55,
-                      height: 55,
+                      width: 40,
+                      height: 40,
                       decoration: BoxDecoration(
                         color: appColor,
                         shape: BoxShape.circle,
@@ -44,7 +44,7 @@ class ContactsDialog extends StatelessWidget {
                         ),
                       ),
                     ),
-                    SizedBox(width: 25,),
+                    SizedBox(width: 15,),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -52,17 +52,17 @@ class ContactsDialog extends StatelessWidget {
                           _contacts.payload[index].alias,
                           style: TextStyle(
                             color: Colors.black,
-                            fontSize: 20,
+                            fontSize: 16,
                           ),
                         ),
                         SizedBox(
-                          height: 5,
+                          height: 2,
                         ),
                         Text(
                           _contacts.payload[index].account,
                           style: TextStyle(
                             color: Colors.grey.shade500,
-                            fontSize: 18,
+                            fontSize: 16,
                           ),
                         ),
                       ],
