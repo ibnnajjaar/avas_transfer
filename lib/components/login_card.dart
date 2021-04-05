@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:avas_transfer/models/contacts_model.dart';
 import 'package:avas_transfer/models/dashboard_model.dart';
 import 'package:avas_transfer/models/default_model.dart';
+import 'package:avas_transfer/models/profile_model.dart';
 import 'package:avas_transfer/screens/transfer_screen.dart';
 import 'package:avas_transfer/services/api.dart' as api;
 import 'package:flutter/cupertino.dart';
@@ -47,7 +48,21 @@ class _LoginCardState extends State<LoginCard> {
       await box.write('password', _passwordController.text.trim());
 
       var r1 = await api.get(context, 'profile');
-      debugPrint(r1.body.toString());
+      // debugPrint(r1.body.toString());
+      var profileModel = ProfileModel.fromJson(json.decode(r1.body));
+
+      if (profileModel.payload.profile.length > 1) {
+        var r11 = await api.post(
+          context,
+          'profile',
+          body: {
+            'profile': profileModel.payload.profile
+                .firstWhere((element) => element.name == 'Personal')
+                .profile,
+          },
+        );
+      }
+
       var r2 = await api.get(context, 'contacts');
       contactsModel = ContactsModel.fromJson(json.decode(r2.body));
       var r3 = await api.get(context, 'dashboard');
@@ -177,7 +192,7 @@ class _LoginCardState extends State<LoginCard> {
               ),
               highlightedBorderColor: Colors.green.shade500,
               highlightColor: Colors.transparent,
-              splashColor:  Colors.green.shade500.withOpacity(0.1),
+              splashColor: Colors.green.shade500.withOpacity(0.1),
               borderSide: BorderSide(
                 color: Colors.green.shade500,
                 width: 1.5,
@@ -190,7 +205,8 @@ class _LoginCardState extends State<LoginCard> {
                       height: 30,
                       width: 30,
                       child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.green.shade500),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.green.shade500),
                         strokeWidth: 2,
                       ),
                     )

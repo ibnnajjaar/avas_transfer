@@ -4,6 +4,7 @@ import 'package:avas_transfer/components/message_dialog.dart';
 import 'package:avas_transfer/models/contacts_model.dart';
 import 'package:avas_transfer/models/dashboard_model.dart';
 import 'package:avas_transfer/models/default_model.dart';
+import 'package:avas_transfer/models/profile_model.dart';
 import 'package:avas_transfer/screens/login_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -61,11 +62,13 @@ String _generateCookieHeader() {
 }
 
 Future<http.Response> get(context, String path) async {
-  var res = await http.get(Uri.https(baseUrl, apiPath + path), headers: headers);
+  var res =
+      await http.get(Uri.https(baseUrl, apiPath + path), headers: headers);
   if (res.statusCode == 401) {
     bool loggedIn = await login(context);
     if (loggedIn)
-      res = await http.get(Uri.https(baseUrl, apiPath + path), headers: headers);
+      res =
+          await http.get(Uri.https(baseUrl, apiPath + path), headers: headers);
     else
       _gotoLoginScreen(context);
   }
@@ -117,7 +120,23 @@ Future<bool> login(context) async {
   DefaultModel model = DefaultModel.fromJson(res.body);
 
   if (model.success) {
-    await get(context, 'profile');
+    // await get(context, 'profile');
+    var r1 = await get(context, 'profile');
+
+    var profileModel = ProfileModel.fromJson(json.decode(r1.body));
+
+    if (profileModel.payload.profile.length > 1) {
+      var r11 = await post(
+        context,
+        'profile',
+        body: {
+          'profile': profileModel.payload.profile
+              .firstWhere((element) => element.name == 'Personal')
+              .profile,
+        },
+      );
+    }
+
     var r2 = await get(context, 'contacts');
     contactsModel = ContactsModel.fromJson(json.decode(r2.body));
     var r3 = await get(context, 'dashboard');
