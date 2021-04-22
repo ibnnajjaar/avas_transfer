@@ -16,7 +16,6 @@ import 'package:avas_transfer/services/api.dart' as api;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
@@ -290,18 +289,18 @@ class _TransferCardState extends State<TransferCard> {
   }
 
   _scanBarcode() async {
-    String res = await FlutterBarcodeScanner.scanBarcode(
-      '#D60D25',
-      'Cancel',
-      false,
-      ScanMode.QR,
-    );
-
-    // 13 is the normal account length
-    if (res.length >= 10) {
-      _accountNumberController.text = res;
-      _validateAccount(null);
-    }
+    // String res = await FlutterBarcodeScanner.scanBarcode(
+    //   '#D60D25',
+    //   'Cancel',
+    //   false,
+    //   ScanMode.QR,
+    // );
+    //
+    // // 13 is the normal account length
+    // if (res.length >= 10) {
+    //   _accountNumberController.text = res;
+    //   _validateAccount(null);
+    // }
   }
 
   // Future<Null> _read() async {
@@ -331,11 +330,14 @@ class _TransferCardState extends State<TransferCard> {
       children: [
         GestureDetector(
           onTap: () async {
+            FocusScope.of(context).unfocus();
+
             var res = await showDialog(
                 context: context,
                 builder: (BuildContext context) {
                   return AccountsDialog();
                 });
+
             if (res != null) {
               final box = GetStorage();
               box.write('accountId', res);
@@ -393,6 +395,7 @@ class _TransferCardState extends State<TransferCard> {
           maxLength: 13,
           autofocus: false,
           controller: _accountNumberController,
+          keyboardAppearance: Brightness.light,
           decoration: InputDecoration(
             contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
             border: OutlineInputBorder(
@@ -460,7 +463,7 @@ class _TransferCardState extends State<TransferCard> {
           textAlign: TextAlign.center,
           enableSuggestions: false,
           autocorrect: false,
-          keyboardType: TextInputType.number,
+          keyboardType: TextInputType.numberWithOptions(decimal: true),
           maxLength: 8,
           decoration: InputDecoration(
             contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
@@ -473,6 +476,7 @@ class _TransferCardState extends State<TransferCard> {
             ),
             counterText: '',
           ),
+          keyboardAppearance: Brightness.light,
           controller: _amountController,
           focusNode: _amountFocusNode,
           onSubmitted: (val) {},
@@ -486,8 +490,8 @@ class _TransferCardState extends State<TransferCard> {
           height: 10,
         ),
         TextField(
-          enableSuggestions: false,
-          autocorrect: false,
+          enableSuggestions: true,
+          autocorrect: true,
           minLines: 3,
           maxLines: 5,
           controller: _remarksController,
@@ -502,6 +506,7 @@ class _TransferCardState extends State<TransferCard> {
             ),
             counterText: '',
           ),
+          keyboardAppearance: Brightness.light,
           onSubmitted: (val) {},
           style: TextStyle(
             fontSize: 20,
@@ -521,6 +526,7 @@ class _TransferCardState extends State<TransferCard> {
           keyboardType: TextInputType.number,
           maxLength: 6,
           controller: _otpController,
+          keyboardAppearance: Brightness.light,
           decoration: InputDecoration(
             contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
             border: OutlineInputBorder(

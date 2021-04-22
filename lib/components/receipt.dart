@@ -77,7 +77,7 @@ class _ReceiptState extends State<Receipt> {
                 ),
                 Flexible(
                   child: Text(
-                    'Transfer transaction is successful.',
+                    'Thank you. Transfer transaction is successful.',
                     textAlign: TextAlign.end,
                     style: TextStyle(
                       color: Colors.grey.shade600,

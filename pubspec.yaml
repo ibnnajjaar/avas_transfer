@@ -18,7 +18,7 @@ dependencies:
   permission_handler: ^6.1.1
   path_provider: ^2.0.1
   share_extend: ^1.1.9
-  flutter_barcode_scanner: ^1.0.2
+#  flutter_barcode_scanner: ^1.0.2
   get_storage: ^2.0.1
 #  flutter_mobile_vision: ^0.1.4+1
 
